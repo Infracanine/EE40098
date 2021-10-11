@@ -1,1 +1,1 @@
-# EE40098
+# EE40098 Computational Intelligence
