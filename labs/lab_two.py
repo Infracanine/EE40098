@@ -12,8 +12,6 @@ import numpy as np
 
 # A single perceptron function
 def perceptron(inputs_list, weights_list, bias):
-    if(inputs_list.len() is not weights_list.len()):
-        print("Length of inputs list and weight list did not match.")
     #Convert the inputs list into a np array
     inputs = np.array(inputs_list)
 
@@ -31,30 +29,51 @@ def perceptron(inputs_list, weights_list, bias):
     output = 1 if summed > 0 else 0
     return output
 
+
 def simulate_boolean_input_perms(weights_list, bias, input_range):
     full_output = []
     print("Weights: ", weights_list)
     print("Bias:    ", bias)
-    for x1 in range(input_range + 1):
-        for x2 in range(input_range + 1):
+    for x1 in range(input_range):
+        for x2 in range(input_range):
             input = [x1, x2]
             out = perceptron(input, weights_list, bias)
             print("P(" + str(input) + ") = " + str(out))
             full_output.append(out)
     return full_output
 
+
 def or_perceptron(inputs_list):
-    return perceptron(inputs_list, [1.0, 1.0], -1)
+    return perceptron(inputs_list, [2.0, 2.0], -1)
 
 def and_perceptron(inputs_list):
-    return perceptron(inputs_list, [1.0, 1.0], 0)
+    return perceptron(inputs_list, [1.0, 1.0], -1)
 
-# Boolean AND (bias of -1)
-print(simulate_boolean_input_perms([1.0, 1.0], bias=-1, input_range=1))
+def nor_perceptron(inputs_list):
+    return perceptron(inputs_list, [-1.0, -1.0], 1)
 
-# Boolean OR (bias of 0)
-print(simulate_boolean_input_perms([1.0, 1.0], bias=0, input_range=1))
+def nand_perceptron(inputs_list):
+    return perceptron(inputs_list, [-1.0, -1.0], 2)
 
-# Boolean 
-print(simulate_boolean_input_perms([1.0, 1.0], bias=-1.5, input_range=1))
+def xor_perceptron(inputs_list):
+    return and_perceptron([or_perceptron(inputs_list), nand_perceptron(inputs_list)])
+
+if __name__ == "__main__":
+    # Boolean AND (bias of -1)
+    print("PERCEPTRON SIMULATING AND")
+    print(simulate_boolean_input_perms([1.0, 1.0], bias=-1, input_range=2))
+
+    # Boolean NAND
+    print("PERCEPTRON SIMULATING NAND")
+    print(simulate_boolean_input_perms([-1.0, -1.0], bias=2, input_range=2))
+
+    # Boolean OR (bias of 0)
+    print("PERCEPTRON SIMULATING OR")
+    print(simulate_boolean_input_perms([1.0, 1.0], bias=0, input_range=2))
+
+    # Boolean XOR
+    print("PERCEPTRON SIMULATING XOR")
+    for x1 in range(2):
+        for x2 in range(2):
+            print(f"p([{x1}, {x2}]) -> {xor_perceptron([x1, x2])}")
 
