@@ -9,6 +9,7 @@
 # Bias of -1 acts as boolean AND
 
 import numpy as np
+import matplotlib.pyplot as plt 
 
 # A single perceptron function
 def perceptron(inputs_list, weights_list, bias):
@@ -29,17 +30,45 @@ def perceptron(inputs_list, weights_list, bias):
     output = 1 if summed > 0 else 0
     return output
 
+def simulate_boolean_input_perms(perceptron, input_range):
+    return
+
+def calculate_intercepts_of_linear_seperator(weights_list, b):
+    output = 0
+    x_intercept = -(b/weights_list[0])
+    y_intercept = -(b/weights_list[1])
+    print(f"X intercept = {x_intercept}, Y intercept = {y_intercept}")
+    return [[0, x_intercept], [0, y_intercept]]
+
+    
 
 def simulate_boolean_input_perms(weights_list, bias, input_range):
-    full_output = []
+    fig = plt.xkcd() 
+    # Set the axis limits 
+    plt.xlim(-2, 2) 
+    plt.ylim(-2, 2) 
+    # Label the plot  
+    plt.xlabel("Input 1")
+    plt.ylabel("Input 2")
+    plt.title("State Space of Input Vector")
+
+    plot_colour = ""
     print("Weights: ", weights_list)
     print("Bias:    ", bias)
+    full_output = []
     for x1 in range(input_range):
         for x2 in range(input_range):
             input = [x1, x2]
             out = perceptron(input, weights_list, bias)
+            plot_colour = "green" if out == 1 else "red"
+            plt.scatter(input[0], input[1], s=50, zorder=3, color=plot_colour)
             print("P(" + str(input) + ") = " + str(out))
             full_output.append(out)
+    intercepts = calculate_intercepts_of_linear_seperator(weights_list, bias)
+    plt.axline(intercepts[0], intercepts[1])
+    plt.grid(True, linewidth=1, linestyle=':')
+    plt.tight_layout() 
+    plt.show()
     return full_output
 
 
