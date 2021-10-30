@@ -30,19 +30,16 @@ def perceptron(inputs_list, weights_list, bias):
     output = 1 if summed > 0 else 0
     return output
 
-def simulate_boolean_input_perms(perceptron, input_range):
-    return
-
-def calculate_intercepts_of_linear_seperator(weights_list, b):
-    output = 0
-    x_intercept = -(b/weights_list[0])
-    y_intercept = -(b/weights_list[1])
-    print(f"X intercept = {x_intercept}, Y intercept = {y_intercept}")
-    return [[0, x_intercept], [0, y_intercept]]
+def calculate_intercepts(weights_list, b):
+    # Calculate x intercept (i.e. where y = 0)
+    x_intercept = -(b / weights_list[0])
+    # Calculate y intercept (i.e. where x = 0)
+    y_intercept = -(b / weights_list[1])
+    return [x_intercept, 0], [0, y_intercept]
 
     
 
-def simulate_boolean_input_perms(weights_list, bias, input_range):
+def simulate_boolean_input_perms(weights_list, bias, input_range, title):
     fig = plt.xkcd() 
     # Set the axis limits 
     plt.xlim(-2, 2) 
@@ -50,12 +47,14 @@ def simulate_boolean_input_perms(weights_list, bias, input_range):
     # Label the plot  
     plt.xlabel("Input 1")
     plt.ylabel("Input 2")
-    plt.title("State Space of Input Vector")
+    plt.title("State Space of " + title + " perceptron")
 
     plot_colour = ""
     print("Weights: ", weights_list)
     print("Bias:    ", bias)
     full_output = []
+
+    # Iterate through all input permutations, calculate and store outputs and generate points on table
     for x1 in range(input_range):
         for x2 in range(input_range):
             input = [x1, x2]
@@ -64,13 +63,38 @@ def simulate_boolean_input_perms(weights_list, bias, input_range):
             plt.scatter(input[0], input[1], s=50, zorder=3, color=plot_colour)
             print("P(" + str(input) + ") = " + str(out))
             full_output.append(out)
-    intercepts = calculate_intercepts_of_linear_seperator(weights_list, bias)
+    intercepts = calculate_intercepts(weights_list, bias)
     plt.axline(intercepts[0], intercepts[1])
     plt.grid(True, linewidth=1, linestyle=':')
     plt.tight_layout() 
     plt.show()
     return full_output
 
+def simulate_xor():
+    print("PERCEPTRON SIMULATING XOR")
+    fig = plt.xkcd() 
+    # Set the axis limits 
+    plt.xlim(-2, 2) 
+    plt.ylim(-2, 2) 
+    # Label the plot  
+    plt.xlabel("Input 1")
+    plt.ylabel("Input 2")
+    plt.title("State Space of bolean XOR perceptron")
+    for x1 in range(2):
+        for x2 in range(2):
+            input = [x1, x2]
+            out = xor_perceptron([x1, x2])
+            plot_colour = "green" if out == 1 else "red"
+            plt.scatter(input[0], input[1], s=50, zorder=3, color=plot_colour)
+            print("P(" + str(input) + ") = " + str(out))
+
+    intercepts_one = calculate_intercepts([2.0, 2.0], -1)
+    intercepts_two = calculate_intercepts([-1.0, -1.0], 1.5)
+    plt.axline(intercepts_one[0], intercepts_one[1])
+    plt.axline(intercepts_two[0], intercepts_two[1])
+    plt.grid(True, linewidth=1, linestyle=':')
+    plt.tight_layout() 
+    plt.show()
 
 def or_perceptron(inputs_list):
     return perceptron(inputs_list, [2.0, 2.0], -1)
@@ -90,19 +114,17 @@ def xor_perceptron(inputs_list):
 if __name__ == "__main__":
     # Boolean AND (bias of -1)
     print("PERCEPTRON SIMULATING AND")
-    print(simulate_boolean_input_perms([1.0, 1.0], bias=-1, input_range=2))
+    print(simulate_boolean_input_perms([1.0, 1.0], bias=-0.5, input_range=2, title="boolean AND"))
 
-    # Boolean NAND
+    # # Boolean NAND
     print("PERCEPTRON SIMULATING NAND")
-    print(simulate_boolean_input_perms([-1.0, -1.0], bias=2, input_range=2))
+    print(simulate_boolean_input_perms([-1.0, -1.0], bias=1.5, input_range=2, title="boolean NAND"))
 
-    # Boolean OR (bias of 0)
+    # # Boolean OR (bias of 0)
     print("PERCEPTRON SIMULATING OR")
-    print(simulate_boolean_input_perms([1.0, 1.0], bias=0, input_range=2))
+    print(simulate_boolean_input_perms([2.0, 2.0], bias=-1, input_range=2, title="boolean OR"))
 
     # Boolean XOR
-    print("PERCEPTRON SIMULATING XOR")
-    for x1 in range(2):
-        for x2 in range(2):
-            print(f"p([{x1}, {x2}]) -> {xor_perceptron([x1, x2])}")
+    simulate_xor()
+
 
