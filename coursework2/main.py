@@ -16,6 +16,12 @@ def population(count, length, min, max):
 # max: the maximum possible value in an individual's list of values
     return [ individual(length, min, max) for x in range(count) ]
 
+def fitness_list(population, target):
+    output = []
+    for each in population:
+        output.append(fitness(each, target))
+    return output
+    
 def fitness(individual, target):
 
     # Determine the fitness of an individual. Lower is better.
@@ -74,8 +80,8 @@ def perform_ga_iterations(target, p_count, i_length, i_min, i_max, iterations):
         p = evolve(p, target)
         fitness_grade = grade(p, target)
         fitness_history.append(fitness_grade)
-        if(fitness_grade == 0.0):
-            print(f"Population reached fitness at iteration{i}, terminating prematurely.")
+        if(0.0 in fitness_list(p, target)):
+            print(f"Population reached fitness at iteration {i}, terminating prematurely.")
             break
         # Check for genetic stagnation
         stagnation_threshold = 10
@@ -90,7 +96,7 @@ if __name__ == "__main__":
     target = 75
 
     # Size of population 
-    p_count = 100
+    p_count = 50
     i_length = 1
     i_min = 0
     i_max = 100
