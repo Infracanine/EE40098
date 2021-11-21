@@ -4,6 +4,7 @@ from functools import reduce
 import numpy.random as npr
 import numpy as np
 import matplotlib.pyplot as plt
+import itertools
 
 # Create binary string encoding a number
 def individual(length):
@@ -36,14 +37,24 @@ def grade(pop, target):
     summed = reduce(add, (fitness(x, target) for x in pop))
     return summed / (len(pop) * 1.0)
 
+# Roulette selection only works when we're attempting to maximise fitness, this implementation is a minimisation problem. 
+# As such, the first thing this selection process performs is to normalise the fitnesses so that all fitnesses are inverted relative to maximum fitness in population
 def roulette_selection(pop, target, retain_length):
-    sum_fitness = reduce(add, (fitness(x, target) for x in pop))
-    probabilities = ([ (fitness(x, target) / sum_fitness) for x in pop ])
+    fitnesses = [fitness(x, target) for x in pop]
+    max_fitness = max(fitnesses) 
+    normalised_fitnesses = [ (max_fitness - x) for x in fitnesses]
+    sum_fitness = sum(normalised_fitnesses)
+    probabilities = []
+    # Handle case where all elements are equal
+    if(sum_fitness == 0):
+        prob = 1 / len(pop)
+        probabilities = list(itertools.repeat(prob, len(pop)))
+    else:
+        probabilities = [ (x / sum_fitness) for x in normalised_fitnesses ]
     # print(sum(probabilities))
     result = []
     for i in range(retain_length):
         result.append(pop[npr.choice(len(pop), p=probabilities)])
-    print(len(result))
     return result
 
 def graded_selection(pop, target, retain_length, random_select):
@@ -56,7 +67,7 @@ def graded_selection(pop, target, retain_length, random_select):
             result.append(individual)
     return result
     
-def evolve(pop, target, retain=0.2, random_select=0.05, mutate=0.1, elitism=0.02, selection_method="RANKED"):
+def evolve(pop, target, retain=0.1, random_select=0.05, mutate=0.1, elitism=0.02, selection_method="RANKED"):
     # 1. SELECTION:
     retain_length = int(len(pop)*retain)
     parents = []
@@ -96,11 +107,11 @@ def evolve(pop, target, retain=0.2, random_select=0.05, mutate=0.1, elitism=0.02
     parents.extend(children)
     return parents
 
-def perform_ga_iterations(target, p_count, i_length, iterations, stagnation_threshold, selection_meth):
-    if(target < 0 or target > ((2 ** i_length) - 1)):
-        print(f"ERROR|Target {target} not in range representable by chromosomes of length {i_length}\n")
+def perform_ga_iterations(target, pop_count, binary_size, iterations, stagnation_threshold, selection_meth="RANKED"):
+    if(target < 0 or target > ((2 ** binary_size) - 1)):
+        print(f"ERROR|Target {target} not in range representable by chromosomes of length {binary_size}\n")
         return
-    p = population(p_count, i_length)
+    p = population(pop_count, binary_size)
     fitness_history = [grade(p, target),]
     for i in range(iterations):
         p = evolve(p, target, selection_method=selection_meth)
@@ -138,7 +149,7 @@ if __name__ == "__main__":
     iterations = 100
     stagnation_thresh = 12
     # perform_multiple_ga_iterations(200, target, p_count, binary_string_length, iterations, stagnation_thresh)
-    fitness_history = perform_ga_iterations(target, p_count, binary_string_length, iterations, stagnation_thresh, "ROULETTE")
+    fitness_history = perform_ga_iterations(target, p_count, binary_string_length, iterations, stagnation_thresh)
 
     for datum in fitness_history:
         print(datum)
